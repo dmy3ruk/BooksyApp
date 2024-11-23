@@ -1,74 +1,153 @@
-import { Image, StyleSheet, Platform } from 'react-native';
+import React from "react";
+import { Text, View, FlatList, StyleSheet, TouchableOpacity } from "react-native";
+import { ScrollView } from "react-native-gesture-handler";
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+import Rating from "@/app/components/menu";
+import Nav from "@/app/components/navigation";
+import Header from "@/app/components/header";
+import { useFonts } from "expo-font";
 
-export default function HomeScreen() {
+type Book = {
+  id: string;
+  title: string;
+  author: string;
+  progress: number;
+  cover?: string;
+};
+
+const books: Book[] = [
+  { id: "1", title: "Четверте крило", author: "Ребекка Ярос", progress: 0.5, cover: "https://via.placeholder.com/100" },
+  { id: "2", title: "Назва", author: "Автор", progress: 0, cover: undefined },
+  { id: "3", title: "Назва", author: "Автор", progress: 0, cover: undefined },
+  { id: "4", title: "Назва", author: "Автор", progress: 0, cover: undefined },
+];
+ const HomeScreen = () => {
+  const renderBookItem = ({ item }: { item: Book }) => (     
+     
+    <View style={styles.bookItem}>
+      <View style={styles.cover} />
+      <View style={styles.bookInfo}>
+        <Text style={styles.title}>{item.title}</Text>
+        <Text style={styles.author}>{item.author}</Text>
+        <Rating />
+        <Text style={styles.progressText}>Прогрес</Text>
+        <View style={styles.progressBarContainer}>
+          <View style={[styles.progressBar, { width: `${item.progress * 100}%` }]} />
+        </View>
+      </View>
+    </View>
+    
+    
+  );
+
+const [fontsLoaded] = useFonts({
+    CustomFont: require('../../assets/fonts/ADLaMDisplay-Regular.ttf'), 
+    TitleFont:  require('../../assets/fonts/PTSerifCaption-Regular.ttf'), 
+    AuthorFont: require('../../assets/fonts/PTSerifCaption-Italic.ttf'),
+  });
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12'
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+    <View style={styles.container}>
+      <Header />
+        <FlatList
+        data={books}
+        renderItem={renderBookItem}
+        keyExtractor={(item) => item.id}
+        contentContainerStyle={styles.bookList}
+      />
+      {/* <Nav/> */}
+      <TouchableOpacity style={styles.fab}>
+        <Text style={styles.fabText}>+</Text>
+      </TouchableOpacity>
+    </View>
   );
 }
 
+
+
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  container: {
+    flex: 1,
+    backgroundColor: "#F1F8FF",
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  bookList: {
+    marginTop:30,
+    paddingHorizontal: 30,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  bookItem: {
+    flexDirection: "row",
+    marginBottom: 40,
+    padding: 2,
+    marginVertical: 5,
+    borderRadius: 8,
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    elevation: 2,
   },
+  cover: {
+    width: 100,
+    height: 128,
+    backgroundColor: "#d0d0d0",
+    borderRadius: 4,
+  },
+  bookInfo: {
+    flex: 1,
+    marginLeft: 10,
+  },
+  title: {
+    fontSize: 18,
+    marginBottom: 5,
+    fontFamily: "TitleFont",
+    fontWeight: "regular",
+  },
+  author: {
+    fontSize: 14,
+    fontFamily: "AuthorFont",
+    color: "#666",
+  },
+  progressText: {
+    marginTop:10,
+    marginBottom:6,
+    fontFamily: "TitleFont",
+    fontSize: 12,
+    color: "#888",
+  },
+  progressBarContainer: {
+    height: 11,
+    width: 213,
+    borderColor: "black",
+    borderWidth: 1,
+    borderRadius: 10,
+    overflow: "hidden",
+  },
+  progressBar: {
+    height: "100%",
+    backgroundColor: "#8B0000",
+  },
+  fab: {
+    shadowOffset:{
+      width: 0,
+      height:4
+    },
+    shadowOpacity: 0.25, 
+    position: "absolute",
+    bottom: 80,
+    right: 4,
+    shadowColor: "black",
+    shadowRadius:8,
+    backgroundColor: "#811826",
+    width: 65,
+    height: 65,
+    borderRadius: 100,
+    justifyContent: "center",
+    alignItems: "center",
+    elevation: 5,
+  },
+  fabText: {
+    color: "white",
+    fontSize: 24,
+  }
 });
+
+export default HomeScreen;
